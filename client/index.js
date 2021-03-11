@@ -2,31 +2,58 @@ import { fetchEarthquakes } from './lib/earthquakes';
 import { el, element, formatDate } from './lib/utils';
 import { init, createPopup } from './lib/map';
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // TODO
-  // Bæta við virkni til að sækja úr lista
-  // Nota proxy
-  // Hreinsa header og upplýsingar þegar ný gögn eru sótt
-  // Sterkur leikur að refactora úr virkni fyrir event handler í sér fall
+async function processLink(link) {
+  const url = new URL(link);
+  const params = url.searchParams;
+  const type = params.get('type');
+  const period = params.get('period');
+  const data = await fetchEarthquakes(type, period);
 
-  const earthquakes = await fetchEarthquakes();
+  return { data, period };
+}
 
-  // Fjarlægjum loading skilaboð eftir að við höfum sótt gögn
-  const loading = document.querySelector('.loading');
-  const parent = loading.parentNode;
-  parent.removeChild(loading);
-
-  if (!earthquakes) {
-    parent.appendChild(
-      el('p', 'Villa við að sækja gögn'),
-    );
+function formatTime(period) {
+  let quakeTime = '';
+  switch (period) {
+    case 'month':
+      quakeTime = 'seinasta mánuð';
+      break;
+    case 'week':
+      quakeTime = 'seinustu viku';
+      break;
+    case 'day':
+      quakeTime = 'seinasta dag';
+      break;
+    case 'hour':
+      quakeTime = 'seinustu klukkustund';
+      break;
+    default:
+      quakeTime = '';
   }
+  return quakeTime;
+}
 
-  const ul = document.querySelector('.earthquakes');
-  const map = document.querySelector('.map');
+function formatInfo(info) {
+  let infoString = '';
+  if (info.cached) infoString += 'Gögn eru í cache. ';
+  else infoString += 'Gögn eru ekki í cache. ';
+  infoString += `Fyrirspurn tók ${info.elapsed} sek.`;
+  return infoString;
+}
+function processQuakes(ul, quakeType, period, earthquakes, info) {
+  // init(document.querySelector('.map'));
+  while (ul.firstChild) {
+    ul.removeChild(ul.lastChild);
+  }
+  const quakeTime = formatTime(period);
 
-  init(map);
+  const header = element('h1', null, null, `${quakeType}, ${quakeTime}`);
 
+  const infoString = formatInfo(info);
+  const infoEl = element('h3', null, null, `${infoString}`);
+
+  ul.appendChild(header);
+  ul.appendChild(infoEl);
   earthquakes.forEach((quake) => {
     const {
       title, mag, time, url,
@@ -63,4 +90,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     ul.appendChild(li);
   });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // TODO
+  // Bæta við virkni til að sækja úr lista
+  // Nota proxy
+  // Hreinsa header og upplýsingar þegar ný gögn eru sótt
+  // Sterkur leikur að refactora úr virkni fyrir event handler í sér fall
+
+  // const loading = document.querySelector('.loading');
+  // const parent = loading.parentNode;
+  // parent.removeChild(loading);
+
+  // if (!earthquakes) {
+  //   parent.appendChild(
+  //     el('p', 'Villa við að sækja gögn'),
+  //   );
+  // }
+  let earthquakes;
+
+  const ul = document.querySelector('.earthquakes');
+  const map = document.querySelector('.map');
+
+  const links = document.querySelectorAll('.list ul a');
+
+  links.forEach((link) => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      earthquakes = await processLink(link);
+
+      const period = earthquakes.period;
+      earthquakes = earthquakes.data;
+      processQuakes(ul, link.innerHTML, period, earthquakes.data.features, earthquakes.info);
+    });
+  });
+
+  init(map);
 });

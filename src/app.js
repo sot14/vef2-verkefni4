@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import express from 'express';
 import dotenv from 'dotenv';
 
-import { router as proxyRouter } from './proxy.js';
+import { proxy as proxyRouter } from './proxy.js';
 
 dotenv.config();
 
@@ -16,6 +16,14 @@ const app = express();
 const path = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(join(path, '../public')));
+app.set('views', join(path, '../views'));
+
+// app.set('views', './views');
+app.set('view engine', 'ejs');
+app.get('/', (req, res) => {
+  res.sendFile(join(path, '../index.html'));
+});
+app.use('/proxy', proxyRouter);
 
 // TODO setja upp proxy þjónustu
 // TODO birta index.html skjal
