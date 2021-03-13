@@ -19,7 +19,6 @@ export async function fetchEarthquakes(type, period) {
   }
 
   const data = await result.json();
-  console.log('fetched earthquakes', data);
 
   return data;
 }

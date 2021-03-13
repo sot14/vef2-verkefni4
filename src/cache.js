@@ -1,12 +1,4 @@
-
-// TODO útfæra redis cache
-
-/*
-Keyrt með:
-node 03.redis-cache.js
-Reiknar n-tu fibonacci tölu, athugar cache áður.
-*/
-
+/* eslint-disable import/no-extraneous-dependencies */
 import redis from 'redis';
 import util from 'util';
 
@@ -64,5 +56,5 @@ export async function setCached(key, data, time) {
 }
 
 client.on('error', (err) => {
-  console.log('Redis error ', err);
+  console.error('Redis error ', err);
 });

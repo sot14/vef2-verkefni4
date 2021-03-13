@@ -1,4 +1,4 @@
-// TODO útfæra proxy virkni
+/* eslint-disable import/no-extraneous-dependencies */
 import express from 'express';
 import fetch from 'node-fetch';
 import { getCached, setCached } from './cache.js';

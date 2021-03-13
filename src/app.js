@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 

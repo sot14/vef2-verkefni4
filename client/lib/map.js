@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import L from 'leaflet';
 
 let map;
