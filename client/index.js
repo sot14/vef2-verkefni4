@@ -1,7 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import { fetchEarthquakes } from './lib/earthquakes';
 import { el, element, formatDate } from './lib/utils';
-import { init, createPopup } from './lib/map';
+import { init, createPopup, clearMarkers } from './lib/map';
 
 async function processLink(link) {
   const url = new URL(link);
@@ -47,21 +47,7 @@ function processQuakes(ul, quakeType, period, earthquakes, info) {
     ul.removeChild(ul.lastChild);
   }
 
-  // remove previous markers from map
-  const mapContainer = document.querySelector('.leaflet-marker-pane');
-  const shadowContainer = document.querySelector('.leaflet-shadow-pane');
-  if (mapContainer) {
-    while (mapContainer.firstChild) {
-      mapContainer.removeChild(mapContainer.lastChild);
-    }
-  }
-
-  if (shadowContainer) {
-    while (shadowContainer.firstChild) {
-      shadowContainer.removeChild(shadowContainer.lastChild);
-    }
-  }
-
+  clearMarkers();
 
   const quakeTime = formatTime(period);
 
